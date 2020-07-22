@@ -47,6 +47,11 @@ acorn@^5.0.0, acorn@^5.5.0:
   version "5.7.3"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.7.3.tgz#67aa231bf8812974b85235a96771eb6bd07ea279"
 
+action-cable-react-jwt@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/action-cable-react-jwt/-/action-cable-react-jwt-0.0.5.tgz#41666e478818919eee55fa0441b57c31df76d68f"
+  integrity sha1-QWZuR4gYkZ7uVfoEQbV8Md921o8=
+
 address@1.0.3, address@^1.0.1:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/address/-/address-1.0.3.tgz#b5f50631f8d6cec8bd20c963963afb55e06cbce9"

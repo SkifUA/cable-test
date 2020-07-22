@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ActionCable from 'action-cable-react-jwt'
 import ChatInput from './ChatInput'
 import ChatMessage from './ChatMessage'
 
@@ -9,28 +10,47 @@ class Chat extends Component {
     name: 'Bob',
     messages: [],
   }
+  // token = "nVzZXJfaWQiOjEwLCJ1aWQiOiIzNzQ3ZDQ0MS01ZTAyLTQwODgtODczZi0wNTBjMTg2MTRmM2IifQ.W7S5yBrczGgp0mvaqp5CK2rHddKcW7s8fcYPedUSumI"
+  token = "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1OTQ5MTE4NzQsInVzZXJfaWQiOjYzLCJ1aWQiOiJkYjVmOTY4Ny00MjYwLTRiMzctYWNhYy00MDAzYjU0ZThlOGYifQ.mNZ7ZcT9WXt6FTROUkX2mTnaAb__ecH6Nuc7IuSnZFU"
+  // ws = new WebSocket(URL)
+  cable = ActionCable.createConsumer("ws://localhost:3000/cable", this.token)
+  // cable = ActionCable.createConsumer("wss://....../cable", this.token)
 
-  ws = new WebSocket(URL)
 
   componentDidMount() {
-    this.ws.onopen = () => {
-      // on connecting, do nothing but log it to the console
-      console.log('connected')
-    }
-
-    this.ws.onmessage = evt => {
-      // on receiving a message, add it to the list of messages
-      const message = JSON.parse(evt.data)
-      this.addMessage(message)
-    }
-
-    this.ws.onclose = () => {
-      console.log('disconnected')
-      // automatically try to reconnect on connection loss
-      this.setState({
-        ws: new WebSocket(URL),
-      })
-    }
+    this.ws = this.cable.subscriptions.create({channel: "MatchChat", match_id: 1}, {
+      connected: () => { console.log("MatchChat: connected") },             // onConnect
+      disconnected: () => { console.log("MatchChat: disconnected") },       // onDisconnect
+      received: (data) => { console.log("MatchChat received: ", data); }         // OnReceive
+    })
+    // this.ws.onopen = () => {
+    //   // on connecting, do nothing but log it to the console
+    //   console.log('connected')
+    // }
+    //
+    // this.ws.onmessage = evt => {
+    //   // on receiving a message, add it to the list of messages
+    //   const message = JSON.parse(evt.data)
+    //   this.addMessage(message)
+    // }
+    //
+    // this.ws.onclose = () => {
+    //   console.log('disconnected')
+    //   // automatically try to reconnect on connection loss
+    //   this.setState({
+    //     ws: new WebSocket(URL),
+    //   })
+    // }
+    this.video = this.cable.subscriptions.create({channel: "UploadVideo", user_account_video_id: 46}, {
+      connected: () => { console.log("UploadVideo: connected") },             // onConnect
+      disconnected: () => { console.log("UploadVideo: disconnected") },       // onDisconnect
+      received: (data) => { console.log("UploadVideo received: ", data); }         // OnReceive
+    })
+    this.image = this.cable.subscriptions.create({channel: "UploadImage", user_account_image_id: 87}, {
+      connected: function() { console.log("cable: connected") },             // onConnect
+      disconnected: function() { console.log("cable: disconnected") },       // onDisconnect
+      received: (data) => { console.log("cable received: ", data); }         // OnReceive
+    })
   }
 
   addMessage = message =>
@@ -58,6 +78,8 @@ class Chat extends Component {
         </label>
         <ChatInput
           ws={this.ws}
+          video={this.video}
+          image={this.image}
           onSubmitMessage={messageString => this.submitMessage(messageString)}
         />
         {this.state.messages.map((message, index) =>
